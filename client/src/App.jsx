@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Resources from './pages/Resources';
+import AdminUpload from './pages/AdminUpload';
 
 // Components
 import Navbar from './components/Navbar';
@@ -50,9 +52,10 @@ function App() {
             
             {/* 4. College Predictor & Counseling 🔥 */}
             <Route path="/counseling" element={<Counseling />} /> 
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/admin-upload-secret" element={<AdminUpload />} />
           </Routes>
         </div>
-        
         {/* Floating Chatbot */}
         <Chatbot />
 

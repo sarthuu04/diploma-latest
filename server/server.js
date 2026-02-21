@@ -10,6 +10,8 @@ const https = require('https');
 // Models Import
 const User = require('./models/User'); 
 const College = require('./models/College');
+// --- NEW: Import the Resource Router ---
+const resourceRoutes = require('./routes/resourceRoutes'); 
 
 dotenv.config();
 const app = express();
@@ -30,7 +32,7 @@ const Message = mongoose.model('ContactMessage', MessageSchema);
 
 // --- GEMINI AI SETUP (Fixed Versioning) ---
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash'; // Fixed common typo to 2.0-flash
 
 const validateGeminiKey = async () => {
   if (!process.env.GEMINI_API_KEY) return;
@@ -84,7 +86,7 @@ const auth = async (req, res, next) => {
 
 // --- ROUTES ---
 
-// 0. CONTACT FORM SUBMISSION (NEW)
+// 0. CONTACT FORM SUBMISSION
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, topic, message } = req.body;
@@ -206,6 +208,9 @@ app.post('/api/ai/chat', async (req, res) => {
     res.status(500).json({ message: 'AI Busy', error: err.message });
   }
 });
+
+// --- NEW: 8. RESOURCES (Notes, PYQs, Model Answers) ---
+app.use('/api/resources', resourceRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server started on http://localhost:${PORT}`));

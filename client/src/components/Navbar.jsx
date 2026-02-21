@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, LogIn, Menu, User, LogOut, GraduationCap, MessageSquare, Sparkles } from 'lucide-react';
+import { BookOpen, LogIn, Menu, User, LogOut, GraduationCap, MessageSquare, ChevronDown, FileText, History, CheckCircle, LayoutList } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   
   const token = localStorage.getItem('token');
   const userName = localStorage.getItem('userName');
@@ -13,6 +14,14 @@ const Navbar = () => {
     localStorage.removeItem('userName');
     navigate('/login');
   };
+
+  // Resource Categories for the Mega Menu
+  const resourceTypes = [
+    { name: 'Study Notes', type: 'Note', icon: <FileText size={16} />, desc: 'Unit-wise theory' },
+    { name: 'PYQ Papers', type: 'PYQ', icon: <History size={16} />, desc: 'Previous years' },
+    { name: 'Model Answers', type: 'Model Answer', icon: <CheckCircle size={16} />, desc: 'Solution keys' },
+    { name: 'MCQ PDFs', type: 'MCQ PDF', icon: <LayoutList size={16} />, desc: 'Practice sets' },
+  ];
 
   return (
     <nav className="flex justify-between items-center px-6 py-4 bg-slate-950/70 backdrop-blur-xl border-b border-white/5 sticky top-0 z-[100]">
@@ -29,19 +38,59 @@ const Navbar = () => {
 
       {/* 2. DESKTOP NAVIGATION LINKS */}
       <div className="hidden md:flex items-center gap-7">
-        {[
-          { name: 'Home', path: '/' },
-          { name: 'MCQ Tests', path: '/mcq-test' },
-        ].map((link) => (
-          <Link 
-            key={link.name}
-            to={link.path} 
-            className="text-sm font-bold text-slate-400 hover:text-white transition-colors tracking-wide uppercase text-[11px]"
-          >
-            {link.name}
-          </Link>
-        ))}
-        
+        <Link to="/" className="text-sm font-bold text-slate-400 hover:text-white transition-colors tracking-wide uppercase text-[11px]">
+          Home
+        </Link>
+        <Link to="/mcq-test" className="text-sm font-bold text-slate-400 hover:text-white transition-colors tracking-wide uppercase text-[11px]">
+          MCQ Tests
+        </Link>
+
+        {/* --- NEW: RESOURCES MEGA MENU --- */}
+        <div 
+          className="relative group"
+          onMouseEnter={() => setIsResourcesOpen(true)}
+          onMouseLeave={() => setIsResourcesOpen(false)}
+        >
+          <button className={`flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide transition-colors ${isResourcesOpen ? 'text-blue-500' : 'text-slate-400 hover:text-white'}`}>
+            Resources <ChevronDown size={12} className={`transition-transform duration-300 ${isResourcesOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Mega Menu Dropdown */}
+          <div className={`absolute top-full -left-20 mt-2 w-[480px] bg-slate-900 border border-white/5 rounded-2xl shadow-2xl p-5 transition-all duration-300 origin-top ${isResourcesOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+            <div className="grid grid-cols-2 gap-3">
+              {resourceTypes.map((item) => (
+                <Link 
+                  key={item.name} 
+                  to={`/resources?type=${item.type}`}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 transition-all group/item"
+                >
+                  <div className="text-blue-500 mt-0.5">{item.icon}</div>
+                  <div>
+                    <div className="text-[11px] font-black text-white uppercase tracking-wider group-hover/item:text-blue-400">{item.name}</div>
+                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{item.desc}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Quick Sem Filter */}
+            <div className="mt-4 pt-4 border-t border-white/5">
+              <div className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Quick Semester Access</div>
+              <div className="flex justify-between items-center bg-slate-950/50 p-1.5 rounded-xl border border-white/5">
+                {[1, 2, 3, 4, 5, 6].map((sem) => (
+                  <Link 
+                    key={sem} 
+                    to={`/resources?semester=${sem}`}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg text-[11px] font-black text-slate-400 hover:bg-blue-600 hover:text-white transition-all hover:scale-110"
+                  >
+                    {sem}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Special Predictor Link */}
         <Link to="/counseling" className="flex items-center gap-1.5 text-blue-400 font-black hover:text-blue-300 transition uppercase text-[11px] tracking-widest bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/10">
           <GraduationCap size={16} />
